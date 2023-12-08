@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
-import PrivateRoute from "react-private-route";
+import { BrowserRouter as Router, Route, Routes, Link, Navigate } from "react-router-dom";
+import PrivateRoute from "./PrivateRoute"; // Ensure this is correctly implemented
 
 import Login from "./Login";
 import Home from "./Home";
@@ -30,15 +30,17 @@ class App extends React.Component {
       <Router>
         <div className={"main-container"}>
           <div>
-            {this.isLoggedIn()
+            {this.state.isLoggedIn
               ? "Logged in, Now you can enter Playground"
               : "You are not authenticated, Please login first"}
           </div>
           <div>
             <ul>
-              <li>
-                <Link to="/home">PlayGround</Link>
-              </li>
+              {this.state.isLoggedIn && (
+                <li>
+                  <Link to="/home">PlayGround</Link>
+                </li>
+              )}
               <li>
                 <Link to="/login">Login</Link>
               </li>
@@ -52,18 +54,14 @@ class App extends React.Component {
             <Route
               path="/home"
               element={
-                <PrivateRoute
-                  isAuthenticated={!!this.isLoggedIn()}
-                  redirectPath="/login"
-                >
+                this.state.isLoggedIn ? (
                   <Home />
-                </PrivateRoute>
+                ) : (
+                  <Navigate to="/login" />
+                )
               }
             />
-            <Route
-              path="*"
-              element={<NotFound />}
-            />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
       </Router>
